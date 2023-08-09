@@ -1,14 +1,43 @@
+<head>
+  <meta charset="UTF-8" />
+</head>
 <div>
   <label for="dragmode">
     Enable panning
     <input type="checkbox" id="dragmode" name="dragmode" />
   </label>
 </div>
-<input type="file" id="fileInput" accept="image/*" style="display: none" />
-<button id="openFileButton">파일 열기</button>
-<button id="saveButton">저장하기</button>
+<input type="file" id="fileInput" style="display: none" />
+<input type="file" id="xmlFileInput" style="display: none" />
+<button id="openFileButton">이미지 파일 열기</button>
+<button id="openXmlButton">xml 파일 열기</button>
 
 <canvas width="1500" height="1000" id="fabric"></canvas>
+
+<div
+  style="
+    max-height: 1000;
+    overflow: scroll;
+    position: absolute;
+    left: 1550;
+    top: 0;
+  "
+>
+  <table id="xmlTable" border="1">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Class</th>
+        <th>Xmin</th>
+        <th>Ymin</th>
+        <th>Xmax</th>
+        <th>Ymax</th>
+        <th>Degree</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.7.15/fabric.min.js"></script>

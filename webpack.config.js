@@ -24,7 +24,7 @@ module.exports = {
   },
 
   mode: "development",
-  entry: ["./src/fabric.js", "./src/client.js"],
+  entry: ["./src/fabric.js", "./src/xmlReader.js"],
   output: {
     path: path.resolve("./dist"),
     filename: "[name].js",

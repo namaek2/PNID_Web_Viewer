@@ -33,18 +33,26 @@ function loadFileToCanvas(input) {
 
       img.src = e.target.result;
     }
-    //파일 확장자가 xml일 경우
-    else if (fileExtension === "xml") {
-      reader.onload = function (e) {
-        alert(reader.result); // Show the content of the XML file in an alert
-      };
-      reader.readAsText(file);
-    } else {
+    //다른 확장자일 경우
+    else {
       alert("Unsupported file type");
     }
   };
 
   reader.readAsDataURL(file);
+}
+
+function drawBox(xmlDoc) {
+  var rect = new fabric.Rect({
+    left: xmlDoc.xmin,
+    top: xmlDoc.ymin,
+    fill: "red",
+    width: xmlDoc.xmax - xmlDoc.xmin,
+    height: xmlDoc.ymax - xmlDoc.ymin,
+    angle: xmlDoc.degree,
+  });
+
+  canvas.add(rect);
 }
 
 // 파일 탐색기 열기
