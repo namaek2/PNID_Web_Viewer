@@ -3,9 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "webpack serve --open",
-    "build": "webpack",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "webpack serve --open --mode=development",
+    "build": "webpack"
   },
   "keywords": [],
   "author": "",
@@ -19,5 +18,13 @@
     "webpack-dev-server": "^4.15.1"
   },
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jbnu-vclab/PNID_Web_Viewer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jbnu-vclab/PNID_Web_Viewer/issues"
+  },
+  "homepage": "https://github.com/jbnu-vclab/PNID_Web_Viewer#readme",
   "description": ""
 }

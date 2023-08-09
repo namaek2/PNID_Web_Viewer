@@ -1,38 +1,26 @@
-const path = require("path"); //노드 모듈 중에 path를 가져와서 사용
-const HtmlWebpackPlugin = require("html-webpack-plugin"); //html을 빌드하기 위한 플러그인
+const path = require("path");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-  target: "web",
-  devServer: {
-    // dist 디렉토리를 웹 서버의 기본 호스트 위치로 설정
-    contentBase: path.resolve(__dirname, "./src"),
-    // 인덱스 파일 설정
-    index: "index.html",
-    // 포트 번호 설정
-    port: 9000,
-    // 핫 모듈 교체(HMR) 활성화 설정
-    hot: true,
-    // gzip 압축 활성화
-    compress: true,
-    // dist 디렉토리에 실제 파일 생성
-    writeToDisk: true,
-    plugins: [
-      new HtmlWebpackPlugin({
-        template: "./src/index.html",
-      }),
-    ],
-  },
-
-  mode: "development",
   entry: ["./src/fabric.js", "./src/xmlReader.js"],
   output: {
-    path: path.resolve("./dist"),
-    filename: "[name].js",
+    // 최종 번들링된 자바스크립트
+    filename: "main.js",
+    // dist를 배포용 폴더로 사용
+    path: path.resolve(__dirname, "dist"),
   },
-  module: {},
+
   plugins: [
     new HtmlWebpackPlugin({
-      template: "./src/index.html",
+      template: "./src/index.html", // index.html을 기본 템플릿으로 반영할 수 있도록 설정
     }),
   ],
+
+  devServer: {
+    // 개발 서버가 dist 폴더를 제공할 수 있도록 설정
+    static: {
+      directory: path.resolve(__dirname, "dist"),
+    },
+    port: 8080,
+  },
 };
