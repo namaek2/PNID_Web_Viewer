@@ -2,9 +2,13 @@ const STATE_IDLE = "idle";
 const STATE_PANNING = "panning";
 
 // Create the canvas
-let canvas = new fabric.Canvas("fabric");
+var canvas = new fabric.Canvas("fabric");
 canvas.backgroundColor = "#f1f1f1";
 canvas.selection = false;
+
+function getCanvas() {
+  return canvas;
+}
 
 // 파일을 로드하고 캔버스의 배경으로 설정하는 함수
 function loadFileToCanvas(input) {
@@ -29,6 +33,7 @@ function loadFileToCanvas(input) {
         });
 
         canvas.add(fabricImage);
+        canvas.sendToBack(fabricImage);
       };
 
       img.src = e.target.result;
@@ -40,19 +45,6 @@ function loadFileToCanvas(input) {
   };
 
   reader.readAsDataURL(file);
-}
-
-function drawBox(xmlDoc) {
-  var rect = new fabric.Rect({
-    left: xmlDoc.xmin,
-    top: xmlDoc.ymin,
-    fill: "red",
-    width: xmlDoc.xmax - xmlDoc.xmin,
-    height: xmlDoc.ymax - xmlDoc.ymin,
-    angle: xmlDoc.degree,
-  });
-
-  canvas.add(rect);
 }
 
 // 파일 탐색기 열기
@@ -72,97 +64,76 @@ fileInput.addEventListener("change", function () {
   loadFileToCanvas(this);
 });
 
-//zoom
-canvas.on("mouse:wheel", function (opt) {
-  var delta = opt.e.deltaY;
-  var zoom = canvas.getZoom();
-  zoom *= 0.999 ** delta; // Zoom factor
-  if (zoom > 5) zoom = 5; // Max zoom limit
-  if (zoom < 0.000001) zoom = 0.000001; // Min zoom limit
-  canvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom);
-  opt.e.preventDefault();
-  opt.e.stopPropagation();
-});
+var isDrawing = false;
+var startDrawingPoint;
+var rect;
+var isPanning = false;
+var lastPosX;
+var lastPosY;
 
-//panning
-fabric.Canvas.prototype.toggleDragMode = function (dragMode) {
-  // Remember the previous X and Y coordinates for delta calculations
-  let lastClientX;
-  let lastClientY;
-  // Keep track of the state
-  let state = STATE_IDLE;
-  // We're entering dragmode
-  if (dragMode) {
-    // Discard any active object
-    this.discardActiveObject();
-    // Set the cursor to 'move'
-    this.defaultCursor = "move";
-    // Loop over all objects and disable events / selectable. We remember its value in a temp variable stored on each object
-    this.forEachObject(function (object) {
-      object.prevEvented = object.evented;
-      object.prevSelectable = object.selectable;
-      object.evented = false;
-      object.selectable = false;
-    });
-    // Remove selection ability on the canvas
-    this.selection = false;
-    // When MouseUp fires, we set the state to idle
-    this.on("mouse:up", function (e) {
-      state = STATE_IDLE;
-    });
-    // When MouseDown fires, we set the state to panning
-    this.on("mouse:down", (e) => {
-      state = STATE_PANNING;
-      lastClientX = e.e.clientX;
-      lastClientY = e.e.clientY;
-    });
-    // When the mouse moves, and we're panning (mouse down), we continue
-    this.on("mouse:move", (e) => {
-      if (state === STATE_PANNING && e && e.e) {
-        // let delta = new fabric.Point(e.e.movementX, e.e.movementY); // No Safari support for movementX and movementY
-        // For cross-browser compatibility, I had to manually keep track of the delta
+canvas.on("mouse:down", function (event) {
+  if (!event.e.shiftKey) {
+    isPanning = true;
+    lastPosX = event.e.clientX;
+    lastPosY = event.e.clientY;
+  } else if (event.e.shiftKey) {
+    isDrawing = true;
+    var pointer = canvas.getPointer(event.e);
+    startDrawingPoint = new fabric.Point(pointer.x, pointer.y);
 
-        // Calculate deltas
-        let deltaX = 0;
-        let deltaY = 0;
-        if (lastClientX) {
-          deltaX = e.e.clientX - lastClientX;
-        }
-        if (lastClientY) {
-          deltaY = e.e.clientY - lastClientY;
-        }
-        // Update the last X and Y values
-        lastClientX = e.e.clientX;
-        lastClientY = e.e.clientY;
-
-        let delta = new fabric.Point(deltaX, deltaY);
-        this.relativePan(delta);
-        this.trigger("moved");
-      }
+    rect = new fabric.Rect({
+      left: startDrawingPoint.x,
+      top: startDrawingPoint.y,
+      width: 0,
+      height: 0,
+      stroke: "red",
+      strokeWidth: 2,
+      fill: "transparent",
     });
-  } else {
-    // When we exit dragmode, we restore the previous values on all objects
-    this.forEachObject(function (object) {
-      object.evented =
-        object.prevEvented !== undefined ? object.prevEvented : object.evented;
-      object.selectable =
-        object.prevSelectable !== undefined
-          ? object.prevSelectable
-          : object.selectable;
-    });
-    // Reset the cursor
-    this.defaultCursor = "default";
-    // Remove the event listeners
-    this.off("mouse:up");
-    this.off("mouse:down");
-    this.off("mouse:move");
-    // Restore selection ability on the canvas
-    this.selection = true;
+    canvas.add(rect);
   }
-};
-
-let dragMode = false;
-$("#dragmode").change((_) => {
-  dragMode = !dragMode;
-  canvas.toggleDragMode(dragMode);
 });
+
+canvas.on("mouse:move", function (event) {
+  if (isPanning) {
+    if (!canvas.getActiveObject()) {
+      var dx = event.e.clientX - lastPosX;
+      var dy = event.e.clientY - lastPosY;
+      canvas.relativePan({ x: dx, y: dy });
+      lastPosX = event.e.clientX;
+      lastPosY = event.e.clientY;
+    }
+  } else if (isDrawing) {
+    var endPoint = canvas.getPointer(event.e);
+    var left = Math.min(startDrawingPoint.x, endPoint.x);
+    var top = Math.min(startDrawingPoint.y, endPoint.y);
+    var width = Math.abs(startDrawingPoint.x - endPoint.x);
+    var height = Math.abs(startDrawingPoint.y - endPoint.y);
+
+    rect.set({ left: left, top: top, width: width, height: height });
+    canvas.renderAll();
+  }
+});
+
+canvas.on("mouse:up", function (event) {
+  if (isPanning) {
+    isPanning = false;
+  } else if (isDrawing) {
+    isDrawing = false;
+  }
+});
+
+canvas.on("mouse:wheel", function (event) {
+  var zoom = canvas.getZoom();
+  var zoomFactor = 1.1; // Adjust this factor for more or less aggressive zooming
+  if (event.e.deltaY < 0) {
+    zoom *= zoomFactor;
+  } else {
+    zoom /= zoomFactor;
+  }
+  canvas.zoomToPoint({ x: event.e.offsetX, y: event.e.offsetY }, zoom);
+  event.e.preventDefault();
+  event.e.stopPropagation();
+});
+
+export { getCanvas };

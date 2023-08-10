@@ -39,6 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
           const row = document.createElement("tr");
           row.innerHTML = `
+              <td>${i}</td>
               <td>${type}</td>
               <td>${classValue}</td>
               <td>${xmin}</td>
