@@ -296,5 +296,5 @@
     "ws": "^8.13.0",
     "yallist": "^4.0.0"
   },
-  "description": ""
+  "description": "웹 기반 PNID 뷰어입니다."
 }

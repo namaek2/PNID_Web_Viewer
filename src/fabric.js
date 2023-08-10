@@ -1,14 +1,7 @@
-const STATE_IDLE = "idle";
-const STATE_PANNING = "panning";
-
 // Create the canvas
 var canvas = new fabric.Canvas("fabric");
 canvas.backgroundColor = "#f1f1f1";
 canvas.selection = false;
-
-function getCanvas() {
-  return canvas;
-}
 
 // 파일을 로드하고 캔버스의 배경으로 설정하는 함수
 function loadFileToCanvas(input) {
@@ -64,6 +57,24 @@ fileInput.addEventListener("change", function () {
   loadFileToCanvas(this);
 });
 
+function countRowsInTable() {
+  const table = document.getElementById("xmlTable");
+
+  if (!table) {
+    console.error(`Table with ID '${"xmlTable"}' not found.`);
+    return -1; // 테이블이 없을 경우 -1 반환
+  }
+
+  const tableBody = table.querySelector("tbody");
+  if (!tableBody) {
+    console.error(`Table '${"xmlTable"}' has no tbody.`);
+    return -1; // tbody가 없을 경우 -1 반환
+  }
+
+  const rowCount = tableBody.querySelectorAll("tr").length;
+  return rowCount;
+}
+
 var isDrawing = false;
 var startDrawingPoint;
 var rect;
@@ -82,6 +93,7 @@ canvas.on("mouse:down", function (event) {
     startDrawingPoint = new fabric.Point(pointer.x, pointer.y);
 
     rect = new fabric.Rect({
+      id: "rect" + countRowsInTable(),
       left: startDrawingPoint.x,
       top: startDrawingPoint.y,
       width: 0,
@@ -119,6 +131,21 @@ canvas.on("mouse:up", function (event) {
   if (isPanning) {
     isPanning = false;
   } else if (isDrawing) {
+    const row = document.createElement("tr");
+    const xmlTable = document.getElementById("xmlTable");
+    const tableBody = xmlTable.querySelector("tbody");
+    row.innerHTML = `
+      <td>${"null"}</td>
+      <td>${"null"}</td>
+        <td>${rect.id}</td>
+        <td>${"class"}</td>
+        <td>${parseInt(rect.left)}</td>
+        <td>${parseInt(rect.top)}</td>
+        <td>${parseInt(rect.width + rect.left)}</td>
+        <td>${parseInt(rect.height + rect.top)}</td>
+        <td>${parseInt(rect.angle)}</td>
+      `;
+    tableBody.appendChild(row);
     isDrawing = false;
   }
 });
@@ -136,4 +163,39 @@ canvas.on("mouse:wheel", function (event) {
   event.e.stopPropagation();
 });
 
-export { getCanvas };
+canvas.on("object:modified", function (event) {
+  var modifiedObject = event.target;
+  canvas.renderAll();
+  var brect = modifiedObject.getBoundingRect();
+  if (modifiedObject instanceof fabric.Rect) {
+    const xmlTable = document.getElementById("xmlTable");
+    const rows = xmlTable.querySelectorAll("tbody tr");
+    const degree = (modifiedObject.angle || 0) * (Math.PI / 180);
+
+    const cos = Math.cos(degree);
+    const sin = Math.sin(degree);
+    const x =
+      modifiedObject.left +
+      cos * modifiedObject.width -
+      sin * modifiedObject.height;
+    const y =
+      modifiedObject.top +
+      sin * modifiedObject.width +
+      cos * modifiedObject.height;
+
+    rows.forEach((row) => {
+      const cell = row.cells[2];
+
+      if (cell.textContent == modifiedObject.id) {
+        const cells = row.querySelectorAll("td");
+        cells[4].textContent = parseInt(modifiedObject.left);
+        cells[5].textContent = parseInt(modifiedObject.top);
+        cells[6].textContent = Math.round(x);
+        cells[7].textContent = Math.round(y);
+        cells[8].textContent = parseInt(modifiedObject.angle);
+      }
+    });
+  }
+});
+
+export default canvas;
