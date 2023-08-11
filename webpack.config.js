@@ -21,6 +21,9 @@ module.exports = {
     static: {
       directory: path.resolve(__dirname, "dist"),
     },
+    client: {
+      overlay: false, // 오류 발생 시 브라우저 화면에 표시
+    },
     port: 8080,
   },
 };

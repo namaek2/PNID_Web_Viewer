@@ -1,7 +1,7 @@
 import canvas from "./fabric.js";
 
-const loadedFiles = [];
-const loadedObjects = [];
+let loadedFiles = [];
+let loadedObjects = [];
 
 document.addEventListener("DOMContentLoaded", function () {
   const xmlFileInput = document.getElementById("xmlFileInput");
@@ -38,14 +38,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const xmlDoc = parser.parseFromString(xmlText, "text/xml");
     const symbolObjects = xmlDoc.getElementsByTagName("symbol_object");
 
-    loadedObjects.push(...symbolObjects);
+    loadedObjects.push(symbolObjects);
 
     addTable(fileName, symbolObjects);
 
     const filetBody = fileTable.querySelector("tbody");
     const row = document.createElement("tr");
     row.innerHTML = `
-        <td>${"null"}</td>
+        <td>${"num"}</td>
         <td>${fileName}</td>
       `;
     filetBody.appendChild(row);
@@ -54,23 +54,27 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function addTable(fileName, symbolObjects) {
     const tableBody = xmlTable.querySelector("tbody");
-    Array.from(symbolObjects).forEach((symbolObject, i) => {
+
+    for (const symbolObject of symbolObjects) {
       const getValue = (tagName) =>
         symbolObject.querySelector(tagName).textContent;
+
+      const values = [
+        "num",
+        fileName,
+        getValue("type"),
+        getValue("class"),
+        getValue("xmin"),
+        getValue("ymin"),
+        getValue("xmax"),
+        getValue("ymax"),
+        getValue("degree"),
+      ];
+
       const row = document.createElement("tr");
-      row.innerHTML = ` 
-        <td>${"null"}</td>
-        <td>${fileName}</td>
-        <td>${getValue("type")}</td>
-        <td>${getValue("class")}</td>
-        <td>${getValue("xmin")}</td>
-        <td>${getValue("ymin")}</td>
-        <td>${getValue("xmax")}</td>
-        <td>${getValue("ymax")}</td>
-        <td>${getValue("degree")}</td>
-      `;
+      row.innerHTML = values.map((value) => `<td>${value}</td>`).join("");
       tableBody.appendChild(row);
-    });
+    }
   }
 
   function addxmlTRowNumbers() {
@@ -88,48 +92,37 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  /*
   function removeAllRectangles() {
     const rectangles = canvas
       .getObjects()
       .filter((obj) => obj instanceof fabric.Rect);
     canvas.remove(...rectangles);
-  }*/
+  }
 
   xmlTable.addEventListener("DOMSubtreeModified", () => {
     addxmlTRowNumbers();
 
-    /*
-    removeAllRectangles;
+    removeAllRectangles();
     const rows = xmlTable.querySelectorAll("tbody tr");
     rows.forEach((row) => {
       const cells = row.querySelectorAll("td");
-      const type = cells[2].textContent;
-      const className = cells[3].textContent;
-      const left = cells[4].textContent;
-      const top = cells[5].textContent;
       const width =
         parseInt(cells[6].textContent) - parseInt(cells[4].textContent);
       const height =
         parseInt(cells[7].textContent) - parseInt(cells[5].textContent);
-      const angle = cells[8].textContent;
-
-      if (type === "rect") {
-        const rect = new fabric.Rect({
-          id: className,
-          left: parseInt(left),
-          top: parseInt(top),
-          width: parseInt(width),
-          height: parseInt(height),
-          angle: parseInt(angle),
-          fill: "transparent",
-          stroke: "red",
-          strokeWidth: 3,
-        });
-        canvas.add(rect);
-      }
+      const rect = new fabric.Rect({
+        id: cells[2].textContent + cells[0].textContent,
+        left: parseInt(cells[4].textContent),
+        top: parseInt(cells[5].textContent),
+        width: width,
+        height: height,
+        angle: parseInt(cells[8].textContent),
+        fill: "transparent",
+        stroke: "red",
+        strokeWidth: 3,
+      });
+      canvas.add(rect);
     });
-    */
   });
 
   fileTable.addEventListener("DOMSubtreeModified", () => {
@@ -174,14 +167,13 @@ document.addEventListener("DOMContentLoaded", function () {
           removeRowsWithValue(row.cells[1].textContent);
         }
       } else if (e.target.textContent === "View File") {
-        /*
         const row = event.target.closest("tr");
         if (row) {
           addTable(
             row.cells[1].textContent,
-            loadedObjects[row.cells[0].textContent]
+            loadedObjects[parseInt(row.cells[0].textContent)]
           );
-        }*/
+        }
       }
       contextMenu.remove();
     });
@@ -245,8 +237,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     cells.forEach((cell, index) => {
-      cell.textContent = "";
-      cell.appendChild(inputFields[index]);
+      cell.textContent = ""; // 오류 발생함! 원인 불명ㅂ
+      cell.appendChild(inputFields[index]); // 입력 필드를 셀에 추가
     });
 
     const saveButton = document.createElement("button");
