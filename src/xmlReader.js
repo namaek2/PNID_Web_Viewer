@@ -88,19 +88,17 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  /*
   function removeAllRectangles() {
     const rectangles = canvas
       .getObjects()
       .filter((obj) => obj instanceof fabric.Rect);
     canvas.remove(...rectangles);
-  }*/
+  }
 
   xmlTable.addEventListener("DOMSubtreeModified", () => {
     addxmlTRowNumbers();
 
-    /*
-    removeAllRectangles;
+    removeAllRectangles();
     const rows = xmlTable.querySelectorAll("tbody tr");
     rows.forEach((row) => {
       const cells = row.querySelectorAll("td");
@@ -113,23 +111,20 @@ document.addEventListener("DOMContentLoaded", function () {
       const height =
         parseInt(cells[7].textContent) - parseInt(cells[5].textContent);
       const angle = cells[8].textContent;
-
-      if (type === "rect") {
-        const rect = new fabric.Rect({
-          id: className,
-          left: parseInt(left),
-          top: parseInt(top),
-          width: parseInt(width),
-          height: parseInt(height),
-          angle: parseInt(angle),
-          fill: "transparent",
-          stroke: "red",
-          strokeWidth: 3,
-        });
-        canvas.add(rect);
-      }
+      const rect = new fabric.Rect({
+        id: className,
+        left: parseInt(left),
+        top: parseInt(top),
+        width: parseInt(width),
+        height: parseInt(height),
+        angle: parseInt(angle),
+        fill: "transparent",
+        stroke: "red",
+        strokeWidth: 3,
+      });
+      canvas.add(rect);
     });
-    */
+    canvas.renderAll();
   });
 
   fileTable.addEventListener("DOMSubtreeModified", () => {
@@ -256,6 +251,27 @@ document.addEventListener("DOMContentLoaded", function () {
     saveButton.addEventListener("click", () => {
       inputFields.forEach((input, index) => {
         cells[index].textContent = input.value;
+      });
+
+      const rectangles = canvas
+        .getObjects()
+        .filter((obj) => obj instanceof fabric.Rect);
+
+      rectangles.forEach((rect) => {
+        alert(rect.id);
+        if (rect.id == cells[2].textContent + cells[0].textContent) {
+          rect.set({
+            id: cells[2].textContent + cells[0].textContent,
+            left: parseInt(cells[4].textContent),
+            top: parseInt(cells[5].textContent),
+            width:
+              parseInt(cells[6].textContent) - parseInt(cells[4].textContent),
+            height:
+              parseInt(cells[7].textContent) - parseInt(cells[5].textContent),
+            angle: parseInt(cells[8].textContent),
+          });
+          alert(rect.id);
+        }
       });
       row.removeChild(saveButton);
     });

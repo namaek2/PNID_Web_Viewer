@@ -127,7 +127,7 @@ canvas.on("mouse:move", function (event) {
   }
 });
 
-canvas.on("mouse:up", function (event) {
+canvas.on("mouse:up", function () {
   if (isPanning) {
     isPanning = false;
   } else if (isDrawing) {
@@ -136,8 +136,8 @@ canvas.on("mouse:up", function (event) {
     const tableBody = xmlTable.querySelector("tbody");
     row.innerHTML = `
       <td>${"null"}</td>
-      <td>${"null"}</td>
-        <td>${rect.id}</td>
+      <td>${"new"}</td>
+        <td>${"rect"}</td>
         <td>${"class"}</td>
         <td>${parseInt(rect.left)}</td>
         <td>${parseInt(rect.top)}</td>
@@ -166,7 +166,6 @@ canvas.on("mouse:wheel", function (event) {
 canvas.on("object:modified", function (event) {
   var modifiedObject = event.target;
   canvas.renderAll();
-  var brect = modifiedObject.getBoundingRect();
   if (modifiedObject instanceof fabric.Rect) {
     const xmlTable = document.getElementById("xmlTable");
     const rows = xmlTable.querySelectorAll("tbody tr");
@@ -182,11 +181,12 @@ canvas.on("object:modified", function (event) {
       modifiedObject.top +
       sin * modifiedObject.width +
       cos * modifiedObject.height;
-
+    alert(modifiedObject.id);
     rows.forEach((row) => {
-      const cell = row.cells[2];
-
-      if (cell.textContent == modifiedObject.id) {
+      if (
+        row.cells[2].textContent + row.cells[0].textContent ==
+        modifiedObject.id
+      ) {
         const cells = row.querySelectorAll("td");
         cells[4].textContent = parseInt(modifiedObject.left);
         cells[5].textContent = parseInt(modifiedObject.top);
