@@ -135,7 +135,7 @@ canvas.on("mouse:up", function () {
     const xmlTable = document.getElementById("xmlTable");
     const tableBody = xmlTable.querySelector("tbody");
     row.innerHTML = `
-      <td>${"null"}</td>
+      <td>${"num"}</td>
       <td>${"new"}</td>
         <td>${"rect"}</td>
         <td>${"class"}</td>
@@ -181,7 +181,7 @@ canvas.on("object:modified", function (event) {
       modifiedObject.top +
       sin * modifiedObject.width +
       cos * modifiedObject.height;
-    alert(modifiedObject.id);
+
     rows.forEach((row) => {
       if (
         row.cells[2].textContent + row.cells[0].textContent ==
