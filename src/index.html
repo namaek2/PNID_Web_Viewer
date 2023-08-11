@@ -1,6 +1,29 @@
 <head>
   <meta charset="UTF-8" />
 </head>
+<style>
+  .context-menu {
+    background-color: grey; /* 원하는 배경색 지정 */
+    border: 1px solid black;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    padding: 5px;
+  }
+
+  .context-menu ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .context-menu ul li {
+    padding: 5px;
+    cursor: pointer;
+  }
+
+  .context-menu ul li:hover {
+    background-color: grey; /* 항목 위에 마우스를 올렸을 때 배경색 변경 */
+  }
+</style>
 <input type="file" id="fileInput" style="display: none" />
 <input type="file" id="xmlFileInput" style="display: none" />
 <button id="openFileButton">이미지 파일 열기</button>
@@ -10,17 +33,38 @@
 
 <div
   style="
-    max-height: 1000;
+    max-height: 300;
     overflow: scroll;
     position: absolute;
     left: 1550;
     top: 0;
   "
 >
+  <table id="fileTable" border="1">
+    <thead>
+      <tr>
+        <th>Num</th>
+        <th>FileName</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<div
+  style="
+    max-height: 1000;
+    overflow: scroll;
+    position: absolute;
+    left: 1550;
+    top: 330;
+  "
+>
   <table id="xmlTable" border="1">
     <thead>
       <tr>
         <th>Num</th>
+        <th>FileName</th>
         <th>Type</th>
         <th>Class</th>
         <th>Xmin</th>
