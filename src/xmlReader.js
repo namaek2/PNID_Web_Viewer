@@ -169,7 +169,6 @@ document.addEventListener("DOMContentLoaded", function () {
       } else if (e.target.textContent === "View File") {
         const row = event.target.closest("tr");
         if (row) {
-          alert("View File");
           addTable(
             row.cells[1].textContent,
             loadedObjects[parseInt(row.cells[0].textContent)]
