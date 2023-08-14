@@ -165,7 +165,6 @@ canvas.on("mouse:wheel", function (event) {
 
 canvas.on("object:modified", function (event) {
   var modifiedObject = event.target;
-  canvas.renderAll();
   if (modifiedObject instanceof fabric.Rect) {
     const xmlTable = document.getElementById("xmlTable");
     const rows = xmlTable.querySelectorAll("tbody tr");
