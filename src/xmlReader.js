@@ -50,6 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
       `;
     filetBody.appendChild(row);
     loadedFiles.push(fileName);
+    refreshTable();
   }
 
   function addTable(fileName, symbolObjects) {
@@ -98,8 +99,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .filter((obj) => obj instanceof fabric.Rect);
     canvas.remove(...rectangles);
   }
-
-  xmlTable.addEventListener("DOMSubtreeModified", () => {
+  function refreshTable() {
     addxmlTRowNumbers();
 
     removeAllRectangles();
@@ -123,7 +123,9 @@ document.addEventListener("DOMContentLoaded", function () {
       });
       canvas.add(rect);
     });
-  });
+
+    return;
+  }
 
   fileTable.addEventListener("DOMSubtreeModified", () => {
     addfileTRowNumbers();
@@ -160,11 +162,13 @@ document.addEventListener("DOMContentLoaded", function () {
           loadedObjects.splice(row.cells[0].textContent, 1);
           loadedFiles.splice(row.cells[0].textContent, 1);
           row.remove();
+          refreshTable();
         }
       } else if (e.target.textContent === "UnView File") {
         const row = event.target.closest("tr");
         if (row) {
           removeRowsWithValue(row.cells[1].textContent);
+          refreshTable();
         }
       } else if (e.target.textContent === "View File") {
         const row = event.target.closest("tr");
@@ -173,6 +177,7 @@ document.addEventListener("DOMContentLoaded", function () {
             row.cells[1].textContent,
             loadedObjects[parseInt(row.cells[0].textContent)]
           );
+          refreshTable();
         }
       }
       contextMenu.remove();
@@ -212,6 +217,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const row = event.target.closest("tr");
         if (row) {
           row.remove();
+          refreshTable();
         }
       } else if (e.target.textContent === "Edit Row") {
         const row = event.target.closest("tr");
@@ -242,6 +248,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     const saveButton = document.createElement("button");
+
     saveButton.textContent = "Save";
     row.appendChild(saveButton);
 
@@ -250,6 +257,7 @@ document.addEventListener("DOMContentLoaded", function () {
         cells[index].textContent = input.value;
       });
       row.removeChild(saveButton);
+      refreshTable();
     });
   }
 

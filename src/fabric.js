@@ -175,12 +175,12 @@ canvas.on("object:modified", function (event) {
     const sin = Math.sin(degree);
     const x =
       modifiedObject.left +
-      cos * modifiedObject.width -
-      sin * modifiedObject.height;
+      cos * modifiedObject.width * modifiedObject.scaleX -
+      sin * modifiedObject.height * modifiedObject.scaleY;
     const y =
       modifiedObject.top +
-      sin * modifiedObject.width +
-      cos * modifiedObject.height;
+      sin * modifiedObject.width * modifiedObject.scaleX +
+      cos * modifiedObject.height * modifiedObject.scaleY;
 
     rows.forEach((row) => {
       if (
