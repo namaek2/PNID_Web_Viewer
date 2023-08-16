@@ -107,21 +107,37 @@ document.addEventListener("DOMContentLoaded", function () {
     const rows = xmlTable.querySelectorAll("tbody tr");
     rows.forEach((row) => {
       const cells = row.querySelectorAll("td");
-      const width =
-        parseInt(cells[6].textContent) - parseInt(cells[4].textContent);
+
+      const xmin = parseInt(cells[4].textContent);
+      const ymin = parseInt(cells[5].textContent);
+      const xmax = parseInt(cells[6].textContent);
+      const ymax = parseInt(cells[7].textContent);
+      const angle = parseInt(cells[8].textContent);
+
+      const degree = angle * (Math.PI / 180);
+
+      const cos = Math.cos(degree);
+      const sin = Math.sin(degree);
+      const tan = Math.tan(degree);
+
       const height =
-        parseInt(cells[7].textContent) - parseInt(cells[5].textContent);
+        (ymax - ymin) / (cos + sin * tan) -
+        (tan * (xmax - xmin)) / (cos + sin * tan);
+
+      const width = (xmax - xmin + sin * height) / cos;
+
       const rect = new fabric.Rect({
         id: cells[2].textContent + cells[0].textContent,
-        left: parseInt(cells[4].textContent),
-        top: parseInt(cells[5].textContent),
+        left: xmin,
+        top: ymin,
         width: width,
         height: height,
-        angle: parseInt(cells[8].textContent),
+        angle: angle,
         fill: "transparent",
         stroke: "red",
         strokeWidth: 3,
       });
+      alert("width : " + width + " height : " + height);
       canvas.add(rect);
     });
 
@@ -136,10 +152,10 @@ document.addEventListener("DOMContentLoaded", function () {
       <td>${"new"}</td>
         <td>${"rect"}</td>
         <td>${"class"}</td>
-        <td>${"0"}</td>
-        <td>${"0"}</td>
-        <td>${"10"}</td>
-        <td>${"10"}</td>
+        <td>${"500"}</td>
+        <td>${"500"}</td>
+        <td>${"600"}</td>
+        <td>${"600"}</td>
         <td>${"0"}</td>
       `;
     tableBody.appendChild(row);
@@ -262,7 +278,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     cells.forEach((cell, index) => {
-      cell.textContent = ""; // 오류 발생함! 원인 불명ㅂ
+      cell.textContent = "";
       cell.appendChild(inputFields[index]); // 입력 필드를 셀에 추가
     });
 
@@ -275,6 +291,12 @@ document.addEventListener("DOMContentLoaded", function () {
       inputFields.forEach((input, index) => {
         cells[index].textContent = input.value;
       });
+      if (parseInt(cells[8].textContent) >= 360) {
+        cells[8].textContent = parseInt(cells[8].textContent) % 360;
+      } else if (parseInt(cells[8].textContent) < 0) {
+        cells[8].textContent = 360 + (parseInt(cells[8].textContent) % 360);
+      }
+
       row.removeChild(saveButton);
       refreshTable();
     });
