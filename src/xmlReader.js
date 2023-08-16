@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const loadButton = document.getElementById("openXmlButton");
   const xmlTable = document.getElementById("xmlTable");
   const fileTable = document.getElementById("fileTable");
+  const newButton = document.getElementById("newButton");
   let contextMenu = null;
 
   loadButton.addEventListener("click", () => xmlFileInput.click());
@@ -126,6 +127,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
     return;
   }
+
+  newButton.addEventListener("click", () => {
+    const tableBody = xmlTable.querySelector("tbody");
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${"num"}</td>
+      <td>${"new"}</td>
+        <td>${"rect"}</td>
+        <td>${"class"}</td>
+        <td>${"0"}</td>
+        <td>${"0"}</td>
+        <td>${"10"}</td>
+        <td>${"10"}</td>
+        <td>${"0"}</td>
+      `;
+    tableBody.appendChild(row);
+    refreshTable();
+  });
 
   fileTable.addEventListener("DOMSubtreeModified", () => {
     addfileTRowNumbers();
